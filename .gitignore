@@ -3,5 +3,7 @@
 .bkit
 .tldr**
 
+*.osm.pbf
+
 backend/.omc
 mobile/.omc
