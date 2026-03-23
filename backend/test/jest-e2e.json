@@ -4,6 +4,10 @@
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
-  }
+    "^.+\\.(t|j)s$": "ts-jest",
+    "node_modules/@xenova/transformers/.+\\.js$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@xenova/transformers)/)"
+  ]
 }
