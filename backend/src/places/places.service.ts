@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
 import { EmbeddingService } from './embedding.service';
 
-const SCORE_THRESHOLD = 0.3;
+const SCORE_THRESHOLD = 0.84;
 
 @Injectable()
 export class PlacesService implements OnModuleInit, OnModuleDestroy {
