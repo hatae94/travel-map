@@ -9,6 +9,7 @@
 
 import { pipeline } from '@xenova/transformers';
 import { Pool } from 'pg';
+import { buildEmbeddingText } from '../src/places/build-text';
 
 const BATCH_SIZE = 200;
 const MODEL_NAME = 'Xenova/multilingual-e5-small';
@@ -21,23 +22,6 @@ async function createPool(): Promise<Pool> {
     user: process.env.PGUSER || 'travel',
     password: process.env.PGPASSWORD || 'travel',
   });
-}
-
-// 검색용 텍스트 조합: name + name_ko + category + type + addr_city
-function buildText(row: {
-  name: string;
-  name_ko: string | null;
-  category: string | null;
-  type: string | null;
-  addr_city: string | null;
-}): string {
-  const parts = [row.name];
-  if (row.name_ko && row.name_ko !== row.name) parts.push(row.name_ko);
-  if (row.category) parts.push(row.category);
-  if (row.type) parts.push(row.type);
-  if (row.addr_city) parts.push(row.addr_city);
-  // e5 모델은 "query: " 또는 "passage: " prefix를 권장
-  return `passage: ${parts.join(' ')}`;
 }
 
 async function main() {
@@ -66,7 +50,8 @@ async function main() {
   while (processed < totalCount) {
     // name_embedding이 NULL인 행을 배치 단위로 가져옴
     const { rows } = await pool.query(
-      `SELECT node_id, name, name_ko, category, type, addr_city
+      `SELECT node_id, name, name_ko, category, type,
+              addr_province, addr_city, addr_district, addr_suburb
        FROM places
        WHERE name_embedding IS NULL
        ORDER BY node_id
@@ -76,7 +61,7 @@ async function main() {
 
     if (rows.length === 0) break;
 
-    const texts = rows.map(buildText);
+    const texts = rows.map(buildEmbeddingText);
 
     // 배치 임베딩 생성
     const output = await extractor(texts, { pooling: 'mean', normalize: true });
