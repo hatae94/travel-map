@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), "Pretendard", -apple-system,
+    BlinkMacSystemFont, system-ui, "Noto Sans KR", sans-serif;
+  --font-mono: var(--font-geist-mono);
+}
